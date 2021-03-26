@@ -8,12 +8,15 @@ After this, extract the download somewhere on your computer, and copy the path i
 You should then travel to your PATH variables on your PC. For windows, you go to
 This PC -> Properties -> Advanced System Settings -> Environment Variables -> System Variables -> Path -> Edit -> New -> Then Paste the path. Press OK on everything.
 
-To get started, cd into the /client folder and the /server folder seperately and type in "npm install" to install the current packages.
-Next, create a file called ".env" in the /server folder and place your credentials in there. Copy the format below and replace the 
+Next, cd into the /client folder and the /server folder seperately and type in "npm install" to install the current packages.
+Then, create a file called ".env" in the /server folder and place your credentials in there. Copy the format below and replace the dummy values
+
+
+
 CONNECTION_USER =  "your_username"
 CONNECTION_PASSWORD = "your_password"
 CONNECTION_URL = "oracle.cise.ufl.edu:1521/orcl"
 CONNECTION_PATH = "path of where you placed your oracle 19 client on your computer"
 
-To run front-end react, go to /client and type "npm start"
-To connect to Oracle, go to /server and type "npm start"
+#### To run front-end react, go to /client and type "npm start"
+#### To connect to Oracle, go to /server and type "npm start"
