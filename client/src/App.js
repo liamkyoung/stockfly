@@ -1,11 +1,15 @@
-import './App.css';
+import './App.css'
+import Graph from './components/Graph.js'
+import SearchBar from './components/SearchBar.js'
 
-function App() {
+function App () {
   return (
-    <div className="App">
-      <p>Default Webpage</p>
+    <div className='App'>
+      <p>Home</p>
+      <SearchBar />
+      <Graph />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
