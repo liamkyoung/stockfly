@@ -1,8 +1,8 @@
 import express from 'express'
-import { getStock } from '../controllers/stock-controller.js'
+import { getStockData } from '../controllers/stock-controller.js'
 
 const router = express.Router()
 
-router.get('/:stock', getStock)
+router.get('/api/stock', getStockData)
 
 export default router

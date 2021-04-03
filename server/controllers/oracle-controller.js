@@ -8,10 +8,11 @@ const URL = process.env.CONNECTION_URL
 const USER = process.env.CONNECTION_USER
 const PASSWORD = process.env.CONNECTION_PASSWORD
 const PATH = process.env.CONNECTION_PATH
+oracledb.fetchAsString = [oracledb.NUMBER]
 
 export const dbConnect = async (req, res, next) => {
   console.log('here1')
-  oracledb.getConnection({
+  await oracledb.getConnection({
     user: USER,
     password: PASSWORD,
     connectString: URL
@@ -19,6 +20,7 @@ export const dbConnect = async (req, res, next) => {
     if (err) {
       console.log('ERROR: Connection with server', err)
     } else {
+      console.log('No errors, onto next.')
       req._oracledb = conn
       next()
     }

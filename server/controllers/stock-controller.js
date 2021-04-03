@@ -1,28 +1,37 @@
-export const getStock = async (req, res) => {
+import oracledb from 'oracledb'
+
+export const getStockData = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock } = query
   console.log('here2')
-  const { stock } = req.params
+  oracledb.fetchAsString = [oracledb.NUMBER]
   if (stock) {
     console.log(stock)
+    const stockData = await _oracledb.execute(`
+      SELECT marketdate, close
+      FROM stockdata
+      WHERE ticker = '${stock}'
+    `, {
+      fetchInfo: {
+        MARKETDATE: { type: oracledb.STRING },
+        CLOSE: { type: oracledb.DEFAULT }
+      }
+    })
+    console.log(`Stock Data for ${stock}`, stockData)
+    await _oracledb.close()
     return res.send({
       success: true,
-      stock: stock
+      message: 'stock data successfully loaded',
+      stockName: stock,
+      data: stockData
     })
   } else {
     console.log('got here.')
+    await _oracledb.close()
     return res.send({
       success: false,
       message: 'failed getting stock'
     })
   }
-}
-
-export const getSector = async (req, res) => {
-  // console.log('here2')
-  console.log(req._oracledb)
-  const result = await req._oracledb.execute(`
-    SELECT sector
-    FROM stock
-    WHERE ticker = 'AFL'`)
-
-  console.log(result)
 }

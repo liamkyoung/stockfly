@@ -8,7 +8,10 @@ class Graph extends React.Component {
     this.state = {
       width: 700,
       height: 350,
-      series: [],
+      series: [{
+        name: '',
+        data: []
+      }],
 
       options: {
         chart: {
@@ -79,11 +82,36 @@ class Graph extends React.Component {
     }
   }
 
+  componentDidMount () {
+    fetch('http://localhost:5000/api/stock/?stock=afl')
+      .then(res => res.json())
+      .then(stock => {
+        // console.log('STOCK DATAAAA', stock.data)
+        const stockData = stock.data.rows.forEach(tuple => {
+          console.log(tuple[1])
+          return [tuple[0], Date.parse(tuple[1])]
+        })
+        console.log('stock formatted dates', stockData)
+        const stockName = stock.stockName
+        this.setState({
+          series: [{
+            name: stockName,
+            data: stockData
+          }]
+        })
+      })
+      .catch((err) => console.log('An error occured while loading the stock data: ', err))
+  }
+
+  componentDidUpdate () {
+    console.log('this.state.series: ', this.state.series)
+  }
+
   render () {
     return (
       <div id='stockchart'>
-        <div class='container'>
-          <div class='row justify-content-md-center'>
+        <div className='container'>
+          <div className='row justify-content-md-center'>
             <ApexChart options={this.state.options} series={this.state.series} type='area' height={this.state.height} width ={this.state.width} />
           </div>
         </div>
