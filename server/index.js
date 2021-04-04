@@ -1,30 +1,21 @@
 import oracledb from 'oracledb'
 import dotenv from 'dotenv'
+import express from 'express'
+import cors from 'cors'
+
+import stockRoutes from './routes/stock.js'
+import { dbConnect } from './controllers/oracle-controller.js'
 
 dotenv.config()
 
 // Place your own Oracle credentials in a ".env" file, in the /server folder
-const URL = process.env.CONNECTION_URL
-const USER = process.env.CONNECTION_USER
-const PASSWORD = process.env.CONNECTION_PASSWORD
-const PATH = process.env.CONNECTION_PATH
+const app = express()
+const PORT = process.env.PORT || 5000
 
+app.use(express.json({ limit: '30mb', extended: true }), cors())
 // Connects to the database
-async function run () {
-  oracledb.initOracleClient({ libDir: PATH })
-  let connection = await oracledb.getConnection({
-    user: USER,
-    password: PASSWORD,
-    connectString: URL
-  }, (err, conn) => {
-    if (err) {
-      console.error('Error: Could not connect', err.message)
-    } else {
-      console.log('Connection Successful!')
-      return conn
-    }
-  })
-}
+app.all('*', dbConnect, stockRoutes)
 
-// Create connection
-run()
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}, Express listening.`))
+// Routes
+// app.get('/api/stock', stockRoutes)

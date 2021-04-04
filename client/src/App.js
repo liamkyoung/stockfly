@@ -1,11 +1,13 @@
-import './App.css';
+import './App.css'
+import Interface from './components/Interface.js'
 
-function App() {
+function App () {
   return (
-    <div className="App">
-      <p>Default Webpage</p>
+    <div className='App'>
+      <p>Home</p>
+      <Interface />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
