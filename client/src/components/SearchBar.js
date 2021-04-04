@@ -6,6 +6,8 @@ class SearchBar extends React.Component {
     this.state = {
       stock: ''
     }
+    this.handleSearch = this.handleSearch.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this)
   }
 
   handleInputChange (e) {
@@ -15,10 +17,15 @@ class SearchBar extends React.Component {
     this.setState({ [name]: target.value })
   }
 
+  handleSearch (e) {
+    e.preventDefault()
+    this.props.handler(this.state.stock)
+  }
+
   render () {
     return (
       <div className='stockInput'>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSearch}>
           <input
             type='text'
             name='stock'

@@ -5,14 +5,15 @@ export const getStockData = async (req, res) => {
   const { query } = req
   const { stock } = query
   console.log('here2')
-  oracledb.fetchAsString = [oracledb.NUMBER]
   if (stock) {
     console.log(stock)
     const stockData = await _oracledb.execute(`
       SELECT marketdate, close
       FROM stockdata
       WHERE ticker = '${stock}'
-    `, {
+    `,
+    {},
+    {
       fetchInfo: {
         MARKETDATE: { type: oracledb.STRING },
         CLOSE: { type: oracledb.DEFAULT }
