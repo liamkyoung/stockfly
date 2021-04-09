@@ -91,6 +91,7 @@ class Graph extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
+    console.log(this.props.stock)
     if (this.props.stock !== prevProps.stock) {
       fetch('http://localhost:5000/api/stock/?stock=' + this.props.stock)
         .then(res => res.json())
@@ -112,6 +113,7 @@ class Graph extends React.Component {
   }
 
   render () {
+    console.log(this.state.loaded)
     if (this.state.loaded) {
       return (
         <div id='stockchart'>
