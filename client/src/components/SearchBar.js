@@ -2,6 +2,7 @@ import React from 'react'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import FormControl from 'react-bootstrap/FormControl'
+import Navbar from 'react-bootstrap/Navbar'
 
 
 class SearchBar extends React.Component {
@@ -23,12 +24,17 @@ class SearchBar extends React.Component {
 
   handleSearch (e) {
     e.preventDefault()
+    console.log(this.state.stock)
     this.props.handler(this.state.stock)
   }
 
   render () {
     return (
       <div className='stockInput'>
+        <Navbar>
+        <Navbar.Brand href="#home">Stockfly</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
         <Form inline onSubmit={this.handleSearch}>
           <FormControl
             type='text'
@@ -39,7 +45,9 @@ class SearchBar extends React.Component {
             placeHolder='Stock'
           />
            <Button onClick={this.handleSearch} variant="outline-success" type="submit">Search</Button>
-        </Form>
+           </Form>
+           </Navbar.Collapse>
+           </Navbar>
       </div>
     )
   }
