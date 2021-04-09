@@ -1,10 +1,10 @@
-import Header from "./Header"
+import stockHeader from "./stockHeader"
 import React from 'react'
 import Graph from './Graph.js'
 import { Navbar } from "react-bootstrap"
 import NavBarLeft from "./NavBarLeft"
 
-class Interface extends React.Component {
+class StockInterface extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -26,12 +26,11 @@ class Interface extends React.Component {
   render () {
     return (
       <div className='front-page'>
-        <Header/>
+        <stockHeader/>
         <NavBarLeft/>
-        <Graph stock={this.state.stock} />
       </div>
     )
   }
 }
 
-export default Interface
+export default StockInterface

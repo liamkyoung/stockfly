@@ -1,4 +1,8 @@
 import React from 'react'
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
+import FormControl from 'react-bootstrap/FormControl'
+
 
 class SearchBar extends React.Component {
   constructor (props) {
@@ -25,20 +29,17 @@ class SearchBar extends React.Component {
   render () {
     return (
       <div className='stockInput'>
-        <form onSubmit={this.handleSearch}>
-          <input
+        <Form inline onSubmit={this.handleSearch}>
+          <FormControl
             type='text'
+            className="mr-sm-2"
             name='stock'
             value={this.state.stock}
             onChange={this.handleInputChange}
             placeHolder='Stock'
           />
-          <input
-            type='submit'
-            class='btn btn-primary'
-            value='Submit'
-          />
-        </form>
+           <Button onClick={this.handleSearch} variant="outline-success" type="submit">Search</Button>
+        </Form>
       </div>
     )
   }
