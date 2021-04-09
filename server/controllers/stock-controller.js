@@ -4,7 +4,7 @@ export const getStockData = async (req, res) => {
   const { _oracledb } = req
   const { query } = req
   const { stock } = query
-  console.log('here2')
+
   if (stock) {
     console.log(stock)
     const stockData = await _oracledb.execute(`
@@ -33,6 +33,41 @@ export const getStockData = async (req, res) => {
     return res.send({
       success: false,
       message: 'failed getting stock'
+    })
+  }
+}
+
+export const getSMA = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock, days } = query
+  console.log('got here')
+  if (stock) {
+    console.log(stock)
+    const stockData = await _oracledb.execute(`
+      SELECT avg(close), ticker,
+      OVER(ORDER BY marketdate
+      ROWS BETWEEN ${days - 1} PRECEDING AND CURRENT ROW)
+      AS ${days - 1}day_moving_average
+      FROM StockData
+      WHERE ticker = '${stock}'
+      `)
+    .then()
+    .catch(err => console.log('Simple Moving Average Not Loaded..', err))
+
+    console.log(`SMA Data for ${stock}`, stockData)
+    await _oracledb.close()
+
+    return res.send({
+      success: true,
+      message: 'Simple moving average',
+      data: stockData
+    })
+  } else {
+    console.log('Stock was not loaded')
+    return res.send({
+      success: false,
+      message: 'Failed getting SMA'
     })
   }
 }
