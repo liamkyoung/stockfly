@@ -1,6 +1,7 @@
 import React from 'react'
 import Graph from './Graph.js'
 import SearchBar from './SearchBar.js'
+import Options from './Options.js'
 
 class Interface extends React.Component {
   constructor (props) {
@@ -8,24 +9,34 @@ class Interface extends React.Component {
     this.state = {
       isLoaded: false,
       stock: '',
-      stockData: []
+      stockData: [],
+      days: ''
     }
     this.getStock = this.getStock.bind(this)
+    this.getSMA = this.getSMA.bind(this)
   }
 
-  getStock = stock => {
+  getStock (stock) {
     this.setState({
       stock: stock
     })
 
-    console.log('UPDATED STOCK')
+    console.log('UPDATED STOCK', this.state.stock)
+  }
+
+  getSMA (days) {
+    this.setState({
+      days: days
+    })
+    console.log('SET DAYS', this.state.days)
   }
 
   render () {
     return (
       <div className='front-page'>
         <SearchBar handler={this.getStock} />
-        <Graph stock={this.state.stock} />
+        <Options handler={this.getSMA} />
+        <Graph stock={this.state.stock} days={this.state.days} />
       </div>
     )
   }

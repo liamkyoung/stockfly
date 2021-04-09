@@ -6,5 +6,4 @@ const router = express.Router()
 router.get('/api/sma', getSMA)
 router.get('/api/stock', getStockData)
 
-
 export default router

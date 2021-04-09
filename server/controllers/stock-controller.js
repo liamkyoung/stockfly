@@ -45,14 +45,21 @@ export const getSMA = async (req, res) => {
   if (stock) {
     console.log(stock)
     const stockData = await _oracledb.execute(`
-      SELECT avg(close), ticker,
-      OVER(ORDER BY marketdate
-      ROWS BETWEEN ${days - 1} PRECEDING AND CURRENT ROW)
-      AS ${days - 1}day_moving_average
-      FROM StockData
-      WHERE ticker = '${stock}'
-      `)
-    .catch(err => console.log('Simple Moving Average Not Loaded..', err))
+    SELECT marketdate, avg(close) OVER(ORDER BY marketdate 
+      ROWS BETWEEN ${days - 1} PRECEDING AND CURRENT ROW) 
+      as moving_avg 
+      FROM (SELECT marketdate, close
+          FROM StockData
+          WHERE ticker = '${stock}')
+      `,
+    {},
+    {
+      fetchInfo: {
+        MARKETDATE: { type: oracledb.STRING },
+        MOVING_AVG: { type: oracledb.DEFAULT }
+      }
+    })
+      .catch(err => console.log('Simple Moving Average Not Loaded..', err))
 
     console.log(`SMA Data for ${stock}`, stockData)
     await _oracledb.close()
