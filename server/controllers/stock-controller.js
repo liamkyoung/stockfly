@@ -52,7 +52,6 @@ export const getSMA = async (req, res) => {
       FROM StockData
       WHERE ticker = '${stock}'
       `)
-    .then()
     .catch(err => console.log('Simple Moving Average Not Loaded..', err))
 
     console.log(`SMA Data for ${stock}`, stockData)
