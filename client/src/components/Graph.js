@@ -8,12 +8,15 @@ class Graph extends React.Component {
     // Graph Properties
     this.state = {
       // Graph Dimensions
-      width: 700,
-      height: 350,
+      width: 1400,
+      height: 700,
       loaded: false,
       // Graph Data
       series: [{
         name: '',
+        data: []
+      }, {
+        name: 'simple moving avg',
         data: []
       }],
       // Graph Options
@@ -61,7 +64,7 @@ class Graph extends React.Component {
         yaxis: {
           labels: {
             formatter: function (val) {
-              return val.toFixed(3)
+              return val.toFixed(2)
             }
           },
           title: {
@@ -77,7 +80,7 @@ class Graph extends React.Component {
           shared: false,
           y: {
             formatter: function (val) {
-              return val.toFixed(3)
+              return val.toFixed(2)
             }
           }
         },
@@ -91,13 +94,12 @@ class Graph extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
+    console.log('DAYS', this.props.days)
     if (this.props.stock !== prevProps.stock) {
       fetch('http://localhost:5000/api/stock/?stock=' + this.props.stock)
         .then(res => res.json())
         .then(stock => {
-        // console.log('STOCK DATAAAA', stock.data)
           const stockData = stock.data.rows
-          // console.log('stock formatted dates', stockData)
           const stockName = stock.stockName
           this.setState({
             series: [{
@@ -108,6 +110,21 @@ class Graph extends React.Component {
           })
         })
         .catch((err) => console.log('An error occured while loading the stock data: ', err))
+      if (this.props.days) {
+        fetch('http://localhost:5000/api/sma/?stock=' + this.props.stock + '&days=' + this.props.days)
+          .then(res => res.json())
+          .then(sma => {
+            const smaData = sma.data.rows
+            const stockName = this.props.stock
+            const smaLine = {
+              name: stockName,
+              data: smaData
+            }
+            this.setState(prevState => ({
+              series: [...prevState.series, smaLine]
+            }))
+          })
+      }
     }
   }
 
