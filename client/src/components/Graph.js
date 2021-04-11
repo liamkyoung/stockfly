@@ -15,9 +15,6 @@ class Graph extends React.Component {
       series: [{
         name: '',
         data: []
-      }, {
-        name: 'simple moving avg',
-        data: []
       }],
       // Graph Options
       options: {
@@ -93,7 +90,9 @@ class Graph extends React.Component {
     }
   }
 
+  // Problem with loading different sets of data: the stock must be loaded before the other things can be added as well.
   componentDidUpdate (prevProps) {
+    console.log(this.props.stock)
     console.log('DAYS', this.props.days)
     if (this.props.stock !== prevProps.stock) {
       fetch('http://localhost:5000/api/stock/?stock=' + this.props.stock)
@@ -115,9 +114,8 @@ class Graph extends React.Component {
           .then(res => res.json())
           .then(sma => {
             const smaData = sma.data.rows
-            const stockName = this.props.stock
             const smaLine = {
-              name: stockName,
+              name: `${this.props.days}day_moving_average`,
               data: smaData
             }
             this.setState(prevState => ({
@@ -125,10 +123,24 @@ class Graph extends React.Component {
             }))
           })
       }
+
+      fetch('http://localhost:5000/api/percentChange/?stock=' + this.props.stock + '&days=' + this.props.pDays)
+        .then(res => res.json())
+        .then(pChange => {
+          const pChangeData = pChange.data.rows
+          const pChangeLine = {
+            name: `${this.props.pDays} percentage change`,
+            data: pChangeData
+          }
+          this.setState(prevState => ({
+            series: [...prevState.series, pChangeLine]
+          }))
+        })
     }
   }
 
   render () {
+    console.log(this.state.loaded)
     if (this.state.loaded) {
       return (
         <div id='stockchart'>
