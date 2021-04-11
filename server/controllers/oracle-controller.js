@@ -10,6 +10,8 @@ const PASSWORD = process.env.CONNECTION_PASSWORD
 const PATH = process.env.CONNECTION_PATH
 oracledb.fetchAsString = [oracledb.NUMBER]
 
+oracledb.initOracleClient({ libDir: PATH })
+
 export const dbConnect = async (req, res, next) => {
   console.log('here1')
   await oracledb.getConnection({
