@@ -1,5 +1,5 @@
 import React from 'react'
-import { InputGroup, FormControl, Button } from 'react-bootstrap'
+import { Dropdown, Form, InputGroup, FormControl, Button } from 'react-bootstrap'
 
 class Options extends React.Component {
   constructor (props) {
@@ -26,7 +26,7 @@ class Options extends React.Component {
   render () {
     return (
       <div className='container'>
-        <div className='col-4 centered'>
+        <div className='col-3 centered'>
           <InputGroup className="mb-3">
             <FormControl
               name='days'
@@ -37,7 +37,7 @@ class Options extends React.Component {
               onChange={this.handleChange}
             />
             <InputGroup.Append>
-              <Button variant="outline-secondary" onClick={this.handleSubmit}>Button</Button>
+              <Button variant="outline-secondary" onClick={this.handleSubmit}>Enter</Button>
             </InputGroup.Append>
           </InputGroup>
         </div>

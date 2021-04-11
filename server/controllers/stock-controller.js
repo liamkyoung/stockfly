@@ -77,3 +77,46 @@ export const getSMA = async (req, res) => {
     })
   }
 }
+
+export const percentChange = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock, days } = query
+
+  if (stock && days) {
+    const stockData = await _oracledb.execute(`
+    SELECT marketdate, ROUND(((price - before_price) / before_price * 100), 2) AS pct_change
+    FROM (
+        SELECT marketdate, ROUND(close, 2) AS price,
+        ROUND(LAG(Close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
+        FROM STOCKDATA
+        WHERE ticker ='${stock}'
+        )
+    WHERE price IS NOT NULL AND before_price IS NOT NULL
+      `,
+    {},
+    {
+      fetchInfo: {
+        MARKETDATE: { type: oracledb.STRING },
+        PRICE: { type: oracledb.DEFAULT },
+        BEFORE_PRICE: { type: oracledb.DEFAULT },
+        PCT_CHANGE: { type: oracledb.DEFAULT }
+      }
+    })
+      .catch(err => console.log('Percentage Change not Loaded.', err))
+
+    console.log(`Percentage Data for ${stock}`, stockData)
+    await _oracledb.close()
+
+    return res.send({
+      success: true,
+      message: 'Percentage Data',
+      data: stockData
+    })
+  } else {
+    return res.send({
+      success: false,
+      message: 'No percentage data selected.'
+    })
+  }
+}
