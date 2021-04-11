@@ -21,14 +21,21 @@ export const getStockData = async (req, res) => {
     })
     console.log(`Stock Data for ${stock}`, stockData)
     await _oracledb.close()
-    return res.send({
-      success: true,
-      message: 'stock data successfully loaded',
-      stockName: stock,
-      data: stockData
-    })
+    if (stockData) {
+      return res.send({
+        success: true,
+        message: 'stock data successfully loaded',
+        stockName: stock,
+        data: stockData
+      })
+    } else {
+      return res.send({
+        success: false,
+        message: 'stockData object undefined.'
+      })
+    }
   } else {
-    console.log('got here.')
+    console.log('Failure. No stock selected.')
     await _oracledb.close()
     return res.send({
       success: false,
@@ -59,6 +66,7 @@ export const getSMA = async (req, res) => {
         MOVING_AVG: { type: oracledb.DEFAULT }
       }
     })
+      .then()
       .catch(err => console.log('Simple Moving Average Not Loaded..', err))
 
     console.log(`SMA Data for ${stock}`, stockData)
@@ -76,4 +84,8 @@ export const getSMA = async (req, res) => {
       message: 'Failed getting SMA'
     })
   }
+}
+
+export const betaCoeff = async (req, res) => {
+  
 }
