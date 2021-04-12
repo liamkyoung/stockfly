@@ -94,7 +94,7 @@ class Graph extends React.Component {
   componentDidUpdate (prevProps) {
     console.log(this.props.stock)
     console.log('DAYS', this.props.days)
-    if (this.props.stock !== prevProps.stock) {
+    if (this.props.stock !== prevProps.stock || this.props.days !== prevProps.days || this.props.pDays !== prevProps.pDays) {
       fetch('http://localhost:5000/api/stock/?stock=' + this.props.stock)
         .then(res => res.json())
         .then(stock => {
@@ -123,19 +123,20 @@ class Graph extends React.Component {
             }))
           })
       }
-
-      fetch('http://localhost:5000/api/percentChange/?stock=' + this.props.stock + '&days=' + this.props.pDays)
-        .then(res => res.json())
-        .then(pChange => {
-          const pChangeData = pChange.data.rows
-          const pChangeLine = {
-            name: `${this.props.pDays} percentage change`,
-            data: pChangeData
-          }
-          this.setState(prevState => ({
-            series: [...prevState.series, pChangeLine]
-          }))
-        })
+      if (this.props.pDays && this.props.pActive) {
+        fetch('http://localhost:5000/api/percentChange/?stock=' + this.props.stock + '&days=' + this.props.pDays)
+          .then(res => res.json())
+          .then(pChange => {
+            const pChangeData = pChange.data.rows
+            const pChangeLine = {
+              name: `${this.props.pDays} day percentage change`,
+              data: pChangeData
+            }
+            this.setState(prevState => ({
+              series: [...prevState.series, pChangeLine]
+            }))
+          })
+      }
     }
   }
 

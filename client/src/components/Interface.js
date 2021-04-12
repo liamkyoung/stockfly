@@ -1,8 +1,6 @@
-import Header from "./Header"
 import React from 'react'
 import Graph from './Graph.js'
 import { Navbar } from "react-bootstrap"
-import NavBarLeft from "./NavBarLeft"
 import SearchBar from './SearchBar.js'
 import SMA from './SMA.js'
 import SectorSelector from './SectorSelector.js'
@@ -50,9 +48,10 @@ class Interface extends React.Component {
     return (
       <div className='front-page'>
         <SearchBar handler={this.getStock} />
-        <NavBarLeft/>
-        <SMA handler={this.getSMA} />
-        <Percentages handler={this.getPercent} />
+        <div>
+          <SMA handler={this.getSMA} />
+          <Percentages handler={this.getPercent} />
+        </div>
         <Graph stock={this.state.stock} days={this.state.days} pDays={this.state.pDays} pActive={this.state.pActivated} />
       </div>
     )

@@ -9,7 +9,7 @@ export const getStockData = async (req, res) => {
     console.log(stock)
     const stockData = await _oracledb.execute(`
       SELECT marketdate, close
-      FROM stockdata
+      FROM LKY.stockdata
       WHERE ticker = '${stock}'
     `,
     {},
@@ -49,7 +49,7 @@ export const getSMA = async (req, res) => {
       ROWS BETWEEN ${days - 1} PRECEDING AND CURRENT ROW) 
       as moving_avg 
       FROM (SELECT marketdate, close
-          FROM StockData
+          FROM LKY.StockData
           WHERE ticker = '${stock}')
       `,
     {},
@@ -89,7 +89,7 @@ export const percentChange = async (req, res) => {
     FROM (
         SELECT marketdate, ROUND(close, 2) AS price,
         ROUND(LAG(Close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
-        FROM STOCKDATA
+        FROM LKY.STOCKDATA
         WHERE ticker ='${stock}'
         )
     WHERE price IS NOT NULL AND before_price IS NOT NULL
@@ -98,8 +98,6 @@ export const percentChange = async (req, res) => {
     {
       fetchInfo: {
         MARKETDATE: { type: oracledb.STRING },
-        PRICE: { type: oracledb.DEFAULT },
-        BEFORE_PRICE: { type: oracledb.DEFAULT },
         PCT_CHANGE: { type: oracledb.DEFAULT }
       }
     })

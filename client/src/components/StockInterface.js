@@ -1,36 +1,34 @@
-import stockHeader from "./stockHeader"
-import React from 'react'
-import Graph from './Graph.js'
-import { Navbar } from "react-bootstrap"
-import NavBarLeft from "./NavBarLeft"
+import stockHeader from "./stockHeader";
+import React from "react";
+import Graph from "./Graph.js";
+import { Navbar } from "react-bootstrap";
 
 class StockInterface extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
       isLoaded: false,
-      stock: '',
-      stockData: []
-    }
-    this.getStock = this.getStock.bind(this)
+      stock: "",
+      stockData: [],
+    };
+    this.getStock = this.getStock.bind(this);
   }
 
-  getStock = stock => {
+  getStock = (stock) => {
     this.setState({
-      stock: stock
-    })
+      stock: stock,
+    });
 
-    console.log('UPDATED STOCK')
-  }
+    console.log("UPDATED STOCK");
+  };
 
-  render () {
+  render() {
     return (
-      <div className='front-page'>
-        <stockHeader/>
-        <NavBarLeft/>
+      <div className="front-page">
+        <stockHeader />
       </div>
-    )
+    );
   }
 }
 
-export default StockInterface
+export default StockInterface;
