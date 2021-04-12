@@ -123,7 +123,6 @@ class Graph extends React.Component {
             }))
           })
       }
-
       fetch('http://localhost:5000/api/percentChange/?stock=' + this.props.stock + '&days=' + this.props.pDays)
         .then(res => res.json())
         .then(pChange => {

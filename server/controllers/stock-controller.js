@@ -120,3 +120,7 @@ export const percentChange = async (req, res) => {
     })
   }
 }
+
+export const getVolume = async (req, res) => {
+  
+}
