@@ -2,7 +2,6 @@ import stockHeader from "./stockHeader";
 import React from "react";
 import Graph from "./Graph.js";
 import { Navbar } from "react-bootstrap";
-import NavBarLeft from "./NavBarLeft";
 
 class StockInterface extends React.Component {
   constructor(props) {
@@ -27,7 +26,6 @@ class StockInterface extends React.Component {
     return (
       <div className="front-page">
         <stockHeader />
-        <NavBarLeft />
       </div>
     );
   }

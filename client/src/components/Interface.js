@@ -1,8 +1,6 @@
-import Header from "./Header"
 import React from 'react'
 import Graph from './Graph.js'
 import { Navbar } from "react-bootstrap"
-import NavBarLeft from "./NavBarLeft"
 import SearchBar from './SearchBar.js'
 import Options from './Options.js'
 
@@ -38,8 +36,9 @@ class Interface extends React.Component {
     return (
       <div className='front-page'>
         <SearchBar handler={this.getStock} />
-        <NavBarLeft/>
-        <Options handler={this.getSMA} />
+        <div>
+           <Options handler={this.getSMA} />
+        </div>
         <Graph stock={this.state.stock} days={this.state.days} />
       </div>
     )
