@@ -91,9 +91,9 @@ export const percentChange = async (req, res) => {
         ROUND(LAG(Close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
         FROM LKY.STOCKDATA
         WHERE ticker ='${stock}'
-        )
+      )
     WHERE price IS NOT NULL AND before_price IS NOT NULL
-      `,
+    `,
     {},
     {
       fetchInfo: {
@@ -115,6 +115,121 @@ export const percentChange = async (req, res) => {
     return res.send({
       success: false,
       message: 'No percentage data selected.'
+    })
+  }
+}
+
+// NEED TO CHANGE--HAVE ONE ROW's MARKETDATE == BEFOREDATE
+export const volumeChart = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock, days } = query
+
+  // console.log('STOCK', stock)
+  if (stock && days) {
+    const stockData = await _oracledb.execute(`
+    SELECT beforedate, marketdate, sum(volume) OVER(ORDER BY marketdate
+      ROWS BETWEEN ${days - 1} PRECEDING AND CURRENT ROW)
+      as volume_sum
+      FROM (
+        SELECT marketdate, volume, (LAG(marketdate, ${days}) OVER (ORDER BY marketdate)) as beforedate
+        FROM LKY.StockData
+        WHERE Ticker = '${stock}'
+      )
+      WHERE beforedate IS NOT NULL
+    `,
+    {},
+    {
+      fetchInfo: {
+        MARKETDATE: { type: oracledb.STRING },
+        BEFOREDATE: { type: oracledb.STRING },
+        VOLUME_SUM: { type: oracledb.DEFAULT }
+      }
+    })
+    .catch(err => console.log('Big error here: ', err))
+
+    console.log(`Volume Data for ${stock}`, stockData)
+    await _oracledb.close()
+
+    if (!stockData) {
+      return res.send({
+        success: false,
+        message: 'Failed to get volume data',
+        data: stockData
+      })
+    } else {
+      return res.send({
+        success: true,
+        message: 'Volume Data',
+        data: stockData
+      })
+    }
+
+
+  } else {
+    return res.send({
+      success: false,
+      message: 'No volume data selected'
+    })
+  }
+}
+
+export const stockPerfSector = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock, sector } = query
+
+  if (stock && sector) {
+    const stockData = await _oracledb.execute(`
+
+    `,
+    {},
+    {
+      fetchInfo: {
+        
+      }
+    })
+    .catch(err => console.log('Big error here: ', err))
+
+    console.log(`Percentage Data for ${stock}`, stockData)
+    await _oracledb.close()
+
+  } else {
+    return res.send({
+      success: false,
+      message: 'No stock and sector data'
+    })
+  }
+}
+
+export const stockPerfIndex = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock, sector } = query
+
+  if (stock && sector) {
+    const stockData = await _oracledb.execute(`
+    
+    `,
+    {},
+    {
+      fetchInfo: {
+        
+      }
+    })
+    .catch(err => console.log('Big error here: ', err))
+
+    console.log(`Stock Performance Index for ${stock}`, stockData)
+    await _oracledb.close()
+
+    return res.send({
+      success: true,
+      message: 'Retrieved Stock Performance Index'
+    })
+  } else {
+    return res.send({
+      success: false,
+      message: 'No stock and sector data'
     })
   }
 }

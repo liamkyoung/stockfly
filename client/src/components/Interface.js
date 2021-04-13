@@ -5,6 +5,7 @@ import SearchBar from './SearchBar.js'
 import SMA from './SMA.js'
 import SectorSelector from './SectorSelector.js'
 import Percentages from './Percentages.js'
+import Option from './Option.js'
 
 class Interface extends React.Component {
   constructor (props) {
@@ -15,6 +16,7 @@ class Interface extends React.Component {
       stockData: [],
       days: '',
       pDays: '',
+      volumeBucket: '',
       pActivated: false
     }
     this.getStock = this.getStock.bind(this)
