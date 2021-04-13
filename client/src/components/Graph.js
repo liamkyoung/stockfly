@@ -220,6 +220,21 @@ class Graph extends React.Component {
           }));
         });
     }
+
+    if (this.props.dtActive && this.props.stock) {
+      fetch('http://localhost:5000/api/dollarsTraded/?stock=' + this.props.stock)
+        .then(res => res.json())
+        .then(dTraded => {
+          const dTradedData = dTraded.data.rows
+          const dTradedLine = {
+            name: `Cash Flow in ${this.props.stock}`,
+            data: dTradedData
+          }
+          this.setState((prevState) => ({
+            series: [...prevState.series, dTradedLine]
+          }))
+        })
+    }
   }
 
   // Problem with loading different sets of data: the stock must be loaded before the other things can be added as well.

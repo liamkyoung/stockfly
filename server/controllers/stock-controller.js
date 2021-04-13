@@ -254,26 +254,26 @@ export const stockPerfIndex = async (req, res) => {
 export const dollarsTraded = async (req, res) => {
   const { _oracledb } = req;
   const { query } = req;
-  const { stock, days } = query;
+  const { stock } = query;
 
-  if (stock && days) {
+  if (stock) {
     const stockData = await _oracledb
       .execute(
         `
-          SELECT marketdate, ROUND(((close + open) * volume / 2), 2)
-          AS dollars_traded FROM (
-            SELECT marketdate, close, open, volume
-            FROM LKY.stockData
-            WHERE ticker = '${stock}'
-          )
-          WHERE dollars_traded IS NOT NULL
+        SELECT marketdate, dollars_traded 
+        FROM (
+                SELECT marketdate, close, open, volume, ROUND(((close + open) * volume / 2), 2) AS dollars_traded
+                FROM LKY.stockData
+                WHERE ticker = '${stock}'
+              )
+        WHERE dollars_traded IS NOT NULL
       `,
         {},
         {
           fetchInfo: {
             MARKETDATE: { type: oracledb.STRING },
-            DOLLARS_TRADED: { type: oracledb.DEFAULT },
-          },
+            DOLLARS_TRADED: { type: oracledb.DEFAULT }
+          }
         }
       )
       .catch((err) => console.log("Dollars Traded not Loaded.", err));

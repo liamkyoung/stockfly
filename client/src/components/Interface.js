@@ -146,6 +146,7 @@ class Interface extends React.Component {
             smaActive={this.state.smaActive}
             pActive={this.state.pActivated}
             vActive={this.state.vActive}
+            dtActive={this.state.dtActive}
           />
         ) : (
           <p>Nothing Loaded...</p>
