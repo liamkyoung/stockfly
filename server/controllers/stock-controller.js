@@ -6,7 +6,7 @@ export const getStockData = async (req, res) => {
   const { stock } = query
 
   if (stock) {
-    console.log(stock)
+    console.log('Loading Stock: ', stock)
     const stockData = await _oracledb.execute(`
       SELECT marketdate, close
       FROM LKY.stockdata
@@ -21,6 +21,8 @@ export const getStockData = async (req, res) => {
     })
     console.log(`Stock Data for ${stock}`, stockData)
     await _oracledb.close()
+    console.log('Database Connection Closed.')
+
     return res.send({
       success: true,
       message: 'stock data successfully loaded',
@@ -41,7 +43,7 @@ export const getSMA = async (req, res) => {
   const { _oracledb } = req
   const { query } = req
   const { stock, days } = query
-  console.log('got here')
+  console.log('Attempting to Load SMA')
   if (stock) {
     console.log(stock)
     const stockData = await _oracledb.execute(`
@@ -63,6 +65,7 @@ export const getSMA = async (req, res) => {
 
     console.log(`SMA Data for ${stock}`, stockData)
     await _oracledb.close()
+    console.log('Database Connection Closed.')
 
     return res.send({
       success: true,
@@ -105,6 +108,7 @@ export const percentChange = async (req, res) => {
 
     console.log(`Percentage Data for ${stock}`, stockData)
     await _oracledb.close()
+    console.log('Database Connection Closed.')
 
     return res.send({
       success: true,
@@ -150,6 +154,7 @@ export const volumeChart = async (req, res) => {
 
     console.log(`Volume Data for ${stock}`, stockData)
     await _oracledb.close()
+    console.log('Database Connection Closed.')
 
     if (!stockData) {
       return res.send({
@@ -193,6 +198,7 @@ export const stockPerfSector = async (req, res) => {
 
     console.log(`Percentage Data for ${stock}`, stockData)
     await _oracledb.close()
+    console.log('Database Connection Closed.')
 
   } else {
     return res.send({
@@ -221,6 +227,7 @@ export const stockPerfIndex = async (req, res) => {
 
     console.log(`Stock Performance Index for ${stock}`, stockData)
     await _oracledb.close()
+    console.log('Database Connection Closed.')
 
     return res.send({
       success: true,
