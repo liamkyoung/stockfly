@@ -140,6 +140,29 @@ class Graph extends React.Component {
           }));
         });
     }
+
+    if (this.props.betaActive && this.props.betaDays) {
+      // load beta from mount
+      await fetch(
+        "http://localhost:5000/api/getBetaData/?stock=" +
+          this.props.stock +
+          "&days=" +
+          this.props.betaDays
+      )
+        .then((res) => res.json())
+        .then((beta) => {
+          const betaData = beta.data.rows;
+          const betaLine = {
+            name: `${this.props.betaDays}day_moving_covariance`,
+            data: betaData,
+          };
+          this.setState((prevState) => ({
+            series: [...prevState.series, betaLine],
+            betaLoaded: true,
+          }));
+        });
+    }
+
     // If percentage query is active and has days...
     if (this.props.pActive && this.props.pDays) {
       console.log("LOADING PERCENTAGE DATAAA");
@@ -238,29 +261,6 @@ class Graph extends React.Component {
           }));
         });
     }
-
-    // beta coefficient relative to S&P 500
-    if (this.props.stock && this.props.betaActive) {
-      console.log("Logging Beta");
-      await fetch(
-        "http://localhost:5000/api/getBetaData/?stock=" +
-          this.props.stock +
-          "&days=" +
-          this.props.betaDays
-      )
-        .then((res) => res.json())
-        .then((beta) => {
-          const betaData = beta.data.rows;
-          const betaLine = {
-            name: `${this.props.betaDays}day_moving_beta`,
-            data: betaData,
-          };
-          this.setState((prevState) => ({
-            series: [...prevState.series, betaLine],
-            betaLoaded: true,
-          }));
-        });
-    }
   }
 
   // Problem with loading different sets of data: the stock must be loaded before the other things can be added as well.
@@ -313,18 +313,16 @@ class Graph extends React.Component {
       this.props.stock !== prevProps.stock &&
       prevProps.betaActive === this.props.betaActive
     ) {
-      await fetch(
-        "http://localhost:5000/api/getBetaData/?stock=" + this.props.stock
-      )
+      await fetch("http://localhost:5000/api/stock/?stock=" + this.props.stock)
         .then((res) => res.json())
-        .then((beta) => {
-          const betaData = beta.data.rows;
-          const stockName = beta.stockName;
+        .then((stock) => {
+          const stockData = stock.data.rows;
+          const stockName = stock.stockName;
           this.setState({
             series: [
               {
                 name: stockName,
-                data: betaData,
+                data: stockData,
               },
             ],
             stockGraphLoaded: true,
@@ -367,21 +365,21 @@ class Graph extends React.Component {
       prevState === this.state
     ) {
       await fetch(
-        "http://localhost:5000/api/sma/?stock=" +
+        "http://localhost:5000/api/getBetaData/?stock=" +
           this.props.stock +
           "&days=" +
           this.props.smaDays
       )
         .then((res) => res.json())
-        .then((sma) => {
-          const smaData = sma.data.rows;
-          const smaLine = {
+        .then((beta) => {
+          const betaData = beta.data.rows;
+          const betaLine = {
             name: `${this.props.smaDays}day_moving_average`,
-            data: smaData,
+            data: betaData,
           };
           this.setState((prevState) => ({
-            series: [...prevState.series, smaLine],
-            smaLoaded: true,
+            series: [...prevState.series, betaLine],
+            betaLoaded: true,
           }));
         });
     }

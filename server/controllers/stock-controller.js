@@ -459,33 +459,33 @@ export const getBetaData = async (req, res) => {
     const stockData = await _oracledb
       .execute(
         `
-    SELECT stockdate, (COVARIANCE(change_stock, change_index) / VARIANCE(change_index)) as beta
+        SELECT stockdate AS marketdate, COVAR_POP(change_stock, change_index) OVER (ORDER BY stockdate) AS beta
         FROM (
-      SELECT marketdate as indexdate, price - before_price AS change_index
-      FROM (
-        SELECT marketdate, ROUND(close, 2) AS price,
-        ROUND(LAG(close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
-        FROM LKY.STOCKINDEXDATA
-        WHERE ticker ='${index}'
-      )
-      WHERE price IS NOT NULL AND before_price IS NOT NULL
-    ),
-      (
-        SELECT marketdate AS stockdate, price - before_price AS change_stock
-        FROM (
-          SELECT marketdate, ROUND(close, 2) AS price,
-          ROUND(LAG(Close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
-          FROM LKY.STOCKDATA
-          WHERE ticker ='${stock}'
-        )
-      WHERE price IS NOT NULL AND before_price IS NOT NULL
-      )
-    WHERE stockdate = indexdate
-    `,
+          SELECT marketdate as indexdate, price - before_price AS change_index
+          FROM (
+            SELECT marketdate, ROUND(close, 2) AS price,
+            ROUND(LAG(close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
+            FROM LKY.STOCKINDEXDATA
+            WHERE ticker ='${index}'
+          )
+          WHERE price IS NOT NULL AND before_price IS NOT NULL
+        ),
+          (
+            SELECT marketdate AS stockdate, price - before_price AS change_stock
+            FROM (
+              SELECT marketdate, ROUND(close, 2) AS price,
+              ROUND(LAG(Close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
+              FROM LKY.STOCKDATA
+              WHERE ticker ='${stock}'
+            )
+          WHERE price IS NOT NULL AND before_price IS NOT NULL
+          )
+        WHERE stockdate = indexdate
+        `,
         {},
         {
           fetchInfo: {
-            STOCKDATE: { type: oracledb.STRING },
+            MARKETDATE: { type: oracledb.STRING },
             BETA: { type: oracledb.DEFAULT },
           },
         }

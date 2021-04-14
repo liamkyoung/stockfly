@@ -231,7 +231,7 @@ class Interface extends React.Component {
             />
             <Option
               handler={this.getBeta}
-              pHolder="Beta Coefficient Day Interval"
+              pHolder="Covariance Day Interval"
               reset={this.state.reset}
             />{" "}
             <br />
