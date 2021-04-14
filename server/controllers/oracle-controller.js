@@ -13,7 +13,7 @@ oracledb.fetchAsString = [oracledb.NUMBER]
 oracledb.initOracleClient({ libDir: PATH })
 
 export const dbConnect = async (req, res, next) => {
-  console.log('here1')
+  console.log('Connecting to DB...')
   await oracledb.getConnection({
     user: USER,
     password: PASSWORD,
