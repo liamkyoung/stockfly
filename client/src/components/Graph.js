@@ -8,7 +8,7 @@ class Graph extends React.Component {
     // Graph Properties
     this.state = {
       // Graph Dimensions
-      width: 1400,
+      width: 1200,
       height: 700,
       stockGraphLoaded: false,
       barChartLoaded: false,
@@ -90,68 +90,6 @@ class Graph extends React.Component {
         }
 
       }
-
-      // seriesBar: [{
-      //   name: 'volume',
-      //   data: []
-      // }],
-      // optionsBar: {
-      //   chart: {
-      //     height: 160,
-      //     type: 'bar',
-      //     brush: {
-      //       enabled: true,
-      //       target: 'stockChart'
-      //     },
-      //     selection: {
-      //       enabled: true,
-      //       xaxis: {
-      //         min: '',
-      //         max: ''
-      //       },
-      //       fill: {
-      //         color: '#ccc',
-      //         opacity: 0.4
-      //       },
-      //       stroke: {
-      //         color: '#0D47A1',
-      //       }
-      //     },
-      //   },
-      //   dataLabels: {
-      //     enabled: false
-      //   },
-      //   plotOptions: {
-      //     bar: {
-      //       columnWidth: '80%',
-      //       colors: {
-      //         ranges: [{
-      //           from: -1000,
-      //           to: 0,
-      //           color: '#F15B46'
-      //         }, {
-      //           from: 1,
-      //           to: 10000,
-      //           color: '#FEB019'
-      //         }]
-      //       }
-      //     }
-      //   },
-      //   stroke: {
-      //     width: 0
-      //   },
-      //   xaxis: {
-      //     type: 'datetime',
-      //     axisBorder: {
-      //       offsetX: 13
-      //     }
-      //   },
-      //   yaxis: {
-      //     labels: {
-      //       show: false
-      //     }
-      //   }
-      // },
     }
   }
 
@@ -176,6 +114,7 @@ class Graph extends React.Component {
 
     // Load Simple Moving Average Information
     if (this.props.smaActive && this.props.smaDays) {
+      console.log('Loading SMA from Mount')
       await fetch('http://localhost:5000/api/sma/?stock=' + this.props.stock + '&days=' + this.props.smaDays)
         .then(res => res.json())
         .then(sma => {
@@ -190,9 +129,10 @@ class Graph extends React.Component {
           }))
         })
     }
-
+    // If percentage query is active and has days...
     if (this.props.pActive && this.props.pDays) {
-      fetch('http://localhost:5000/api/percentChange/?stock=' + this.props.stock + '&days=' + this.props.pDays)
+      console.log('LOADING PERCENTAGE DATAAA')
+      await fetch('http://localhost:5000/api/percentChange/?stock=' + this.props.stock + '&days=' + this.props.pDays)
         .then(res => res.json())
         .then(pChange => {
           const pChangeData = pChange.data.rows
@@ -205,11 +145,71 @@ class Graph extends React.Component {
           }))
         })
     }
+
+    // Sector Comparison
+    if (this.props.sector && this.props.stock && this.props.compActive && this.props.compDays) {
+      console.log('Logging Sector Performance')
+      await fetch('http://localhost:5000/api/stockPerfSector/?stock=' + this.props.stock + '&days=' + this.props.compDays + '&sector=' + this.props.sector)
+        .then(res => res.json())
+        .then(pChange => {
+          const pChangeData = pChange.data.rows
+          const pChangeLine = {
+            name: `${this.props.stock} Performance vs ${this.props.sector} Performance`,
+            data: pChangeData
+          }
+          this.setState(prevState => ({
+            series: [...prevState.series, pChangeLine]
+          }))
+        })
+    }
+
+    // Index Comparison
+    if (this.props.index && this.props.stock && this.props.compActive && this.props.compDays) {
+      console.log('Logging Index Performance')
+      await fetch('http://localhost:5000/api/stockPerfIndex/?stock=' + this.props.stock + '&days=' + this.props.compDays + '&index=' + this.props.index)
+        .then(res => res.json())
+        .then(pChange => {
+          const pChangeData = pChange.data.rows
+          const pChangeLine = {
+            name: `${this.props.stock} Performance vs ${this.props.index} Performance`,
+            data: pChangeData
+          }
+          this.setState(prevState => ({
+            series: [...prevState.series, pChangeLine]
+          }))
+        })
+    }
+
+    // Dollars Traded.
+    if (this.props.stock && this.props.vActive) {
+      console.log('Logging Dollars Traded')
+      await fetch('http://localhost:5000/api/dollarsTraded/?stock=' + this.props.stock)
+        .then(res => res.json())
+        .then(dTraded => {
+          const dTradedData = dTraded.data.rows
+          const dTradedLine = {
+            name: `Total Cash Flow for ${this.props.stock}`,
+            data: dTradedData
+          }
+          this.setState(prevState => ({
+            series: [...prevState.series, dTradedLine]
+          }))
+        })
+    }
   }
 
   // Problem with loading different sets of data: the stock must be loaded before the other things can be added as well.
   async componentDidUpdate (prevProps, prevState) {
     // console.log('componentDidUpdate...')
+    if (prevProps.stock && !this.props.stock && this.state.series[0].data) {
+      console.log('resetting ')
+      this.setState({
+        series: [{
+          name: '',
+          data: []
+        }]
+      })
+    }
 
     // Reset SMA Line if Deselected
     if (this.state.smaLoaded && this.props.stock && !this.props.smaActive && (prevProps.smaActive !== this.props.smaActive)) {
@@ -239,24 +239,11 @@ class Graph extends React.Component {
           })
         })
         .catch((err) => console.log('An error occured while loading the stock data: ', err))
-      // fetch('http://localhost:5000/api/volumeChart/?stock=' + this.props.stock + '&days=' + this.props.days)
-      //   .then(res => res.json())
-      //   .then(stock => {
-      //     const stockData = stock.data.rows
-      //     const stockName = stock.stockName
-      //     this.setState({
-      //       seriesBar: [{
-      //         name: stockName,
-      //         data: stockData
-      //       }],
-      //       barChartloaded: true
-      //     })
-      //   })
     }
 
     // Set simple moving average if there is not one already.
-    if (!this.state.smaLoaded && this.props.stock && this.props.smaActive && this.props.smaDays) {
-      console.log('Getting SMA from Graph')
+    if (!this.state.smaLoaded && this.props.stock && this.props.smaActive && this.props.smaDays && (prevState === this.state)) {
+      console.log('Loading SMA from Update')
       await fetch('http://localhost:5000/api/sma/?stock=' + this.props.stock + '&days=' + this.props.smaDays)
         .then(res => res.json())
         .then(sma => {

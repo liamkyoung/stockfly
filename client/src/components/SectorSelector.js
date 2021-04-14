@@ -4,34 +4,50 @@ import { Dropdown } from 'react-bootstrap'
 class SectorSelector extends Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      selected: '',
+      changed: false
+    }
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  async handleChange (e) {
+    const target = document.getElementById('sector_selector').value
+    await this.setState({
+      selected: target
+    })
+    console.log('what is the state...', this.state.selected)
+    this.props.handler(this.state.selected)
+  }
+
+  componentDidUpdate () {
+    if (this.props.reset) {
+      document.getElementById('sector_selector').value = ''
+    }
   }
 
   render () {
     return (
       <div className='container'>
         <div className='row'>
-          <div className='col-6'>
-            <Dropdown>
-              <Dropdown.Toggle variant='success'>
-                Sector
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item href="Communication Services">Communication Services</Dropdown.Item>
-                <Dropdown.Item href="Consumer Cyclical">Consumer Cyclical</Dropdown.Item>
-                <Dropdown.Item href="Consumer Defensive">Consumer Defensive</Dropdown.Item>
-                <Dropdown.Item href="Consumer Discretionary">Consumer Discretionary</Dropdown.Item>
-                <Dropdown.Item href="Consumer Staples">Consumer Staples</Dropdown.Item>
-                <Dropdown.Item href="Energy">Energy</Dropdown.Item>
-                <Dropdown.Item href="Entertainment">Entertainment</Dropdown.Item>
-                <Dropdown.Item href="Financials">Financials</Dropdown.Item>
-                <Dropdown.Item href="Health Care">Health Care</Dropdown.Item>
-                <Dropdown.Item href="Industrials">Industrials</Dropdown.Item>
-                <Dropdown.Item href="Information Technology">Information Technology</Dropdown.Item>
-                <Dropdown.Item href="Materials">Materials</Dropdown.Item>
-                <Dropdown.Item href="Real Estate">Real Estate</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+          <p>Compare To... </p>
+          <div className='col-8'>
+            <select id='sector_selector' class='form-control' onClick={this.handleChange}>
+              <option value=''>Sector</option>
+              <option value="Communication Services">Communication Services</option>
+              <option value="Consumer Cyclical">Consumer Cyclical</option>
+              <option value="Consumer Defensive">Consumer Defensive</option>
+              <option value="Consumer Discretionary">Consumer Discretionary</option>
+              <option value="Consumer Staples">Consumer Staples</option>
+              <option value="Energy">Energy</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Financials">Financials</option>
+              <option value="Health Care">Health Care</option>
+              <option value="Industrials">Industrials</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Materials">Materials</option>
+              <option value="Real Estate">Real Estate</option>
+            </select>
           </div>
         </div>
       </div>
