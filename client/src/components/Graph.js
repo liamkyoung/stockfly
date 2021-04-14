@@ -90,68 +90,6 @@ class Graph extends React.Component {
         }
 
       }
-
-      // seriesBar: [{
-      //   name: 'volume',
-      //   data: []
-      // }],
-      // optionsBar: {
-      //   chart: {
-      //     height: 160,
-      //     type: 'bar',
-      //     brush: {
-      //       enabled: true,
-      //       target: 'stockChart'
-      //     },
-      //     selection: {
-      //       enabled: true,
-      //       xaxis: {
-      //         min: '',
-      //         max: ''
-      //       },
-      //       fill: {
-      //         color: '#ccc',
-      //         opacity: 0.4
-      //       },
-      //       stroke: {
-      //         color: '#0D47A1',
-      //       }
-      //     },
-      //   },
-      //   dataLabels: {
-      //     enabled: false
-      //   },
-      //   plotOptions: {
-      //     bar: {
-      //       columnWidth: '80%',
-      //       colors: {
-      //         ranges: [{
-      //           from: -1000,
-      //           to: 0,
-      //           color: '#F15B46'
-      //         }, {
-      //           from: 1,
-      //           to: 10000,
-      //           color: '#FEB019'
-      //         }]
-      //       }
-      //     }
-      //   },
-      //   stroke: {
-      //     width: 0
-      //   },
-      //   xaxis: {
-      //     type: 'datetime',
-      //     axisBorder: {
-      //       offsetX: 13
-      //     }
-      //   },
-      //   yaxis: {
-      //     labels: {
-      //       show: false
-      //     }
-      //   }
-      // },
     }
   }
 
@@ -208,6 +146,7 @@ class Graph extends React.Component {
         })
     }
 
+    // Sector Comparison
     if (this.props.sector && this.props.stock && this.props.compActive && this.props.compDays) {
       await fetch('http://localhost:5000/api/stockPerfSector/?stock=' + this.props.stock + '&days=' + this.props.compDays + '&sector=' + this.props.sector)
         .then(res => res.json())
@@ -223,6 +162,7 @@ class Graph extends React.Component {
         })
     }
 
+    // Index Comparison
     if (this.props.index && this.props.stock && this.props.compActive && this.props.compDays) {
       await fetch('http://localhost:5000/api/stockPerfIndex/?stock=' + this.props.stock + '&days=' + this.props.compDays + '&index=' + this.props.index)
         .then(res => res.json())
@@ -238,6 +178,7 @@ class Graph extends React.Component {
         })
     }
 
+    // Dollars Traded.
     if (this.props.stock && this.props.vActive) {
       await fetch('http://localhost:5000/api/dollarsTraded/?stock=' + this.props.stock)
         .then(res => res.json())
@@ -258,7 +199,7 @@ class Graph extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     // console.log('componentDidUpdate...')
     if (prevProps.stock && !this.props.stock && this.state.series[0].data) {
-      console.log('resetting graph...')
+      console.log('resetting ')
       this.setState({
         series: [{
           name: '',

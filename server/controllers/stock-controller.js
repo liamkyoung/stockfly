@@ -191,29 +191,68 @@ export const volumeChart = async (req, res) => {
 export const stockPerfSector = async (req, res) => {
   const { _oracledb } = req
   const { query } = req
-  const { stock, sector } = query
+  const { stock, sector, days } = query
 
   if (stock && sector) {
     const stockData = await _oracledb
       .execute(
         `
-
+        SELECT pct_change_stock - pct_change_sector as difference, stockdate
+        FROM (
+             SELECT marketdate AS stockdate, ROUND(((price - before_price) / before_price * 100), 2) AS pct_change_stock
+             FROM (
+                  SELECT marketdate, ROUND(close, 2) AS price,
+                  ROUND(LAG(Close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
+                  FROM LKY.STOCKDATA
+                  WHERE ticker ='${stock}'
+                  )
+              WHERE price IS NOT NULL AND before_price IS NOT NULL
+              ),
+           (
+            SELECT ROUND(((price - before_price) / before_price * 100), 2) AS pct_change_sector, mktdate
+            FROM (
+                    SELECT price, mktdate, ROUND(LAG(price, ${days}) OVER (ORDER BY mktdate), 2) as before_price
+                    FROM (
+                        SELECT SECTOR, res.marketdate as mktdate, AVG(close) as price
+                        FROM (
+                            SELECT STOCKS.ticker, sector, marketdate, close
+                            FROM STOCKS, STOCKDATA
+                            WHERE STOCKS.Ticker = STOCKDATA.Ticker
+                            ) res
+                        GROUP BY SECTOR, res.marketdate
+                        )
+                    WHERE SECTOR = '${sector}'
+                   )
+            WHERE before_price IS NOT NULL)
+        WHERE stockdate = mktdate
+        ORDER BY stockdate ASC
     `,
         {},
         {
-          fetchInfo: {},
+          fetchInfo: {
+            STOCKDATE: { type: oracledb.STRING },
+            DIFFERENCE: { type: oracledb.DEFAULT }
+          }
         }
       )
-      .catch((err) => console.log("Big error here: ", err));
+      .catch((err) => console.log("Big error here: ", err))
 
-    console.log(`Percentage Data for ${stock}`, stockData);
-    await _oracledb.close();
-    console.log("Database Connection Closed.");
+    console.log(`Percentage Data for ${stock}`, stockData)
+    await _oracledb.close()
+    console.log("Database Connection Closed.")
+
+    if (stockData) {
+      return res.send({
+        success: true,
+        message: "Sector Comparison Data Loaded",
+        data: stockData
+      })
+    }
   } else {
     return res.send({
       success: false,
-      message: "No stock and sector data",
-    });
+      message: "No stock and sector data"
+    })
   }
 }
 
@@ -402,5 +441,4 @@ export const getStockInfo = async (req, res) => {
       message: 'Total Tuples not Loaded.'
     })
   }
-
 }
