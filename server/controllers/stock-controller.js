@@ -193,11 +193,11 @@ export const stockPerfSector = async (req, res) => {
   const { query } = req
   const { stock, sector, days } = query
 
-  if (stock && sector) {
+  if (stock && sector && days) {
     const stockData = await _oracledb
       .execute(
         `
-        SELECT pct_change_stock - pct_change_sector as difference, stockdate
+        SELECT stockdate, pct_change_stock - pct_change_sector as difference
         FROM (
              SELECT marketdate AS stockdate, ROUND(((price - before_price) / before_price * 100), 2) AS pct_change_stock
              FROM (
@@ -266,7 +266,7 @@ export const stockPerfIndex = async (req, res) => {
     const stockData = await _oracledb
       .execute(
         `
-    SELECT pct_change_stock - pct_change_index as pct_difference, stockdate as marketdate
+    SELECT stockdate, pct_change_stock - pct_change_index as pct_difference
     FROM (
       SELECT marketdate as indexdate, ROUND(((price - before_price) / before_price * 100), 2) AS pct_change_index
       FROM (
@@ -292,8 +292,8 @@ export const stockPerfIndex = async (req, res) => {
         {},
         {
           fetchInfo: {
-            PCT_DIFFERENCE: { type: oracledb.DEFAULT },
-            MARKETDATE: { type: oracledb.STRING }
+            STOCKDATE: { type: oracledb.STRING },
+            PCT_DIFFERENCE: { type: oracledb.DEFAULT }
           }
         }
       )

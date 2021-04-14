@@ -148,6 +148,7 @@ class Graph extends React.Component {
 
     // Sector Comparison
     if (this.props.sector && this.props.stock && this.props.compActive && this.props.compDays) {
+      console.log('Logging Sector Performance')
       await fetch('http://localhost:5000/api/stockPerfSector/?stock=' + this.props.stock + '&days=' + this.props.compDays + '&sector=' + this.props.sector)
         .then(res => res.json())
         .then(pChange => {
@@ -164,6 +165,7 @@ class Graph extends React.Component {
 
     // Index Comparison
     if (this.props.index && this.props.stock && this.props.compActive && this.props.compDays) {
+      console.log('Logging Index Performance')
       await fetch('http://localhost:5000/api/stockPerfIndex/?stock=' + this.props.stock + '&days=' + this.props.compDays + '&index=' + this.props.index)
         .then(res => res.json())
         .then(pChange => {
@@ -180,6 +182,7 @@ class Graph extends React.Component {
 
     // Dollars Traded.
     if (this.props.stock && this.props.vActive) {
+      console.log('Logging Dollars Traded')
       await fetch('http://localhost:5000/api/dollarsTraded/?stock=' + this.props.stock)
         .then(res => res.json())
         .then(dTraded => {
