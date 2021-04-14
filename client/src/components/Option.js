@@ -25,10 +25,11 @@ class Options extends React.Component {
     this.props.handler(this.state.selected, this.state.days)
   }
 
-  componentDidUpdate (prevProps) {
-    if (prevProps.reset !== this.props.reset) {
-      this.setState({
-        days: ''
+  async componentDidUpdate (prevProps, prevState) {
+    if (this.props.reset && prevState === this.state) {
+      await this.setState({
+        days: '',
+        selected: false
       })
     }
   }

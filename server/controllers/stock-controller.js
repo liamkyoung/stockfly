@@ -1,40 +1,42 @@
 import oracledb from 'oracledb'
 
 export const getStockData = async (req, res) => {
-  const { _oracledb } = req
-  const { query } = req
-  const { stock } = query
+  const { _oracledb } = req;
+  const { query } = req;
+  const { stock } = query;
 
   if (stock) {
-    console.log('Loading Stock: ', stock)
-    const stockData = await _oracledb.execute(`
+    console.log("Loading Stock: ", stock);
+    const stockData = await _oracledb.execute(
+      `
       SELECT marketdate, close
       FROM LKY.stockdata
       WHERE ticker = '${stock}'
     `,
-    {},
-    {
-      fetchInfo: {
-        MARKETDATE: { type: oracledb.STRING },
-        CLOSE: { type: oracledb.DEFAULT }
+      {},
+      {
+        fetchInfo: {
+          MARKETDATE: { type: oracledb.STRING },
+          CLOSE: { type: oracledb.DEFAULT },
+        },
       }
-    })
-    console.log(`Stock Data for ${stock}`, stockData)
-    await _oracledb.close()
-    console.log('Database Connection Closed.')
+    );
+    console.log(`Stock Data for ${stock}`, stockData);
+    await _oracledb.close();
+    console.log("Database Connection Closed.");
 
     return res.send({
       success: true,
-      message: 'stock data successfully loaded',
+      message: "stock data successfully loaded",
       stockName: stock,
       data: stockData
     })
   } else {
-    console.log('got here.')
+    console.log("got here.");
     await _oracledb.close()
     return res.send({
       success: false,
-      message: 'failed getting stock'
+      message: "failed getting stock"
     })
   }
 }
@@ -43,10 +45,12 @@ export const getSMA = async (req, res) => {
   const { _oracledb } = req
   const { query } = req
   const { stock, days } = query
-  console.log('Attempting to Load SMA')
+  console.log("Attempting to Load SMA")
   if (stock) {
     console.log(stock)
-    const stockData = await _oracledb.execute(`
+    const stockData = await _oracledb
+      .execute(
+        `
     SELECT marketdate, avg(close) OVER(ORDER BY marketdate 
       ROWS BETWEEN ${days - 1} PRECEDING AND CURRENT ROW) 
       as moving_avg 
@@ -54,14 +58,15 @@ export const getSMA = async (req, res) => {
           FROM LKY.StockData
           WHERE ticker = '${stock}')
       `,
-    {},
-    {
-      fetchInfo: {
-        MARKETDATE: { type: oracledb.STRING },
-        MOVING_AVG: { type: oracledb.DEFAULT }
-      }
-    })
-      .catch(err => console.log('Simple Moving Average Not Loaded..', err))
+        {},
+        {
+          fetchInfo: {
+            MARKETDATE: { type: oracledb.STRING },
+            MOVING_AVG: { type: oracledb.DEFAULT },
+          }
+        }
+      )
+      .catch((err) => console.log("Simple Moving Average Not Loaded..", err))
 
     console.log(`SMA Data for ${stock}`, stockData)
     await _oracledb.close()
@@ -87,7 +92,9 @@ export const percentChange = async (req, res) => {
   const { stock, days } = query
 
   if (stock && days) {
-    const stockData = await _oracledb.execute(`
+    const stockData = await _oracledb
+      .execute(
+        `
     SELECT marketdate, ROUND(((price - before_price) / before_price * 100), 2) AS pct_change
     FROM (
         SELECT marketdate, ROUND(close, 2) AS price,
@@ -97,28 +104,29 @@ export const percentChange = async (req, res) => {
       )
     WHERE price IS NOT NULL AND before_price IS NOT NULL
     `,
-    {},
-    {
-      fetchInfo: {
-        MARKETDATE: { type: oracledb.STRING },
-        PCT_CHANGE: { type: oracledb.DEFAULT }
-      }
-    })
-      .catch(err => console.log('Percentage Change not Loaded.', err))
+        {},
+        {
+          fetchInfo: {
+            MARKETDATE: { type: oracledb.STRING },
+            PCT_CHANGE: { type: oracledb.DEFAULT },
+          }
+        }
+      )
+      .catch((err) => console.log("Percentage Change not Loaded.", err));
 
-    console.log(`Percentage Data for ${stock}`, stockData)
-    await _oracledb.close()
-    console.log('Database Connection Closed.')
+    console.log(`Percentage Data for ${stock}`, stockData);
+    await _oracledb.close();
+    console.log("Database Connection Closed.");
 
     return res.send({
       success: true,
-      message: 'Percentage Data',
+      message: "Percentage Data",
       data: stockData
     })
   } else {
     return res.send({
       success: false,
-      message: 'No percentage data selected.'
+      message: "No percentage data selected."
     })
   }
 }
@@ -131,7 +139,9 @@ export const volumeChart = async (req, res) => {
 
   // console.log('STOCK', stock)
   if (stock && days) {
-    const stockData = await _oracledb.execute(`
+    const stockData = await _oracledb
+      .execute(
+        `
     SELECT beforedate, marketdate, sum(volume) OVER(ORDER BY marketdate
       ROWS BETWEEN ${days - 1} PRECEDING AND CURRENT ROW)
       as volume_sum
@@ -142,39 +152,38 @@ export const volumeChart = async (req, res) => {
       )
       WHERE beforedate IS NOT NULL
     `,
-    {},
-    {
-      fetchInfo: {
-        MARKETDATE: { type: oracledb.STRING },
-        BEFOREDATE: { type: oracledb.STRING },
-        VOLUME_SUM: { type: oracledb.DEFAULT }
-      }
-    })
-    .catch(err => console.log('Big error here: ', err))
+        {},
+        {
+          fetchInfo: {
+            MARKETDATE: { type: oracledb.STRING },
+            BEFOREDATE: { type: oracledb.STRING },
+            VOLUME_SUM: { type: oracledb.DEFAULT }
+          }
+        }
+      )
+      .catch((err) => console.log("Big error here: ", err))
 
     console.log(`Volume Data for ${stock}`, stockData)
-    await _oracledb.close()
-    console.log('Database Connection Closed.')
+    await _oracledb.close();
+    console.log("Database Connection Closed.")
 
     if (!stockData) {
       return res.send({
         success: false,
-        message: 'Failed to get volume data',
+        message: "Failed to get volume data",
         data: stockData
       })
     } else {
       return res.send({
         success: true,
-        message: 'Volume Data',
+        message: "Volume Data",
         data: stockData
       })
     }
-
-
   } else {
     return res.send({
       success: false,
-      message: 'No volume data selected'
+      message: "No volume data selected"
     })
   }
 }
@@ -185,21 +194,81 @@ export const stockPerfSector = async (req, res) => {
   const { stock, sector } = query
 
   if (stock && sector) {
-    const stockData = await _oracledb.execute(`
+    const stockData = await _oracledb
+      .execute(
+        `
 
     `,
-    {},
-    {
-      fetchInfo: {
-        
-      }
-    })
-    .catch(err => console.log('Big error here: ', err))
+        {},
+        {
+          fetchInfo: {},
+        }
+      )
+      .catch((err) => console.log("Big error here: ", err));
 
-    console.log(`Percentage Data for ${stock}`, stockData)
+    console.log(`Percentage Data for ${stock}`, stockData);
+    await _oracledb.close();
+    console.log("Database Connection Closed.");
+  } else {
+    return res.send({
+      success: false,
+      message: "No stock and sector data",
+    });
+  }
+}
+
+export const stockPerfIndex = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock, index, days } = query
+
+  console.log('Loading Stock Performance Data Compared to ', index)
+  if (stock && index && days) {
+    const stockData = await _oracledb
+      .execute(
+        `
+    SELECT pct_change_stock - pct_change_index as pct_difference, stockdate as marketdate
+    FROM (
+      SELECT marketdate as indexdate, ROUND(((price - before_price) / before_price * 100), 2) AS pct_change_index
+      FROM (
+        SELECT marketdate, ROUND(close, 2) AS price,
+        ROUND(LAG(close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
+        FROM LKY.STOCKINDEXDATA
+        WHERE ticker ='${index}'
+      )
+      WHERE price IS NOT NULL AND before_price IS NOT NULL
+    ),
+      (
+        SELECT marketdate AS stockdate, ROUND(((price - before_price) / before_price * 100), 2) AS pct_change_stock
+        FROM (
+          SELECT marketdate, ROUND(close, 2) AS price,
+          ROUND(LAG(Close, ${days}) OVER (ORDER BY marketdate), 2) as before_price
+          FROM LKY.STOCKDATA
+          WHERE ticker ='${stock}'
+        )
+      WHERE price IS NOT NULL AND before_price IS NOT NULL
+      )
+    WHERE stockdate = indexdate
+    `,
+        {},
+        {
+          fetchInfo: {
+            PCT_DIFFERENCE: { type: oracledb.DEFAULT },
+            MARKETDATE: { type: oracledb.STRING }
+          }
+        }
+      )
+      .catch((err) => console.log('Error loading difference: ', err))
+
+    console.log(`Stock Performance Index for ${stock}`, stockData)
     await _oracledb.close()
     console.log('Database Connection Closed.')
 
+    return res.send({
+      success: true,
+      message: 'Retrieved Stock Performance Index',
+      data: stockData
+    })
   } else {
     return res.send({
       success: false,
@@ -208,35 +277,130 @@ export const stockPerfSector = async (req, res) => {
   }
 }
 
-export const stockPerfIndex = async (req, res) => {
+export const dollarsTraded = async (req, res) => {
   const { _oracledb } = req
   const { query } = req
-  const { stock, sector } = query
+  const { stock } = query
 
-  if (stock && sector) {
-    const stockData = await _oracledb.execute(`
-    
-    `,
-    {},
-    {
-      fetchInfo: {
-        
-      }
-    })
-    .catch(err => console.log('Big error here: ', err))
+  console.log('Dollars Traded Loading')
+  if (stock) {
+    const stockData = await _oracledb
+      .execute(
+        `
+        SELECT marketdate, dollars_traded 
+        FROM (
+              SELECT marketdate, close, open, volume, ROUND(((close + open) * volume / 2), 2) AS dollars_traded
+              FROM LKY.stockData
+              WHERE ticker = '${stock}'
+              )
+        WHERE dollars_traded IS NOT NULL
+      `,
+        {},
+        {
+          fetchInfo: {
+            MARKETDATE: { type: oracledb.STRING },
+            DOLLARS_TRADED: { type: oracledb.DEFAULT }
+          }
+        }
+      )
+      .catch((err) => console.log("Dollars Traded not Loaded.", err))
 
-    console.log(`Stock Performance Index for ${stock}`, stockData)
+    console.log(`Dollars Traded for ${stock}`, stockData)
     await _oracledb.close()
-    console.log('Database Connection Closed.')
 
     return res.send({
       success: true,
-      message: 'Retrieved Stock Performance Index'
+      message: 'Dollars Traded',
+      data: stockData
     })
   } else {
     return res.send({
       success: false,
-      message: 'No stock and sector data'
+      message: 'No dollars traded data selected.'
     })
   }
+}
+
+export const totalTuples = async (req, res) => {
+  const { _oracledb } = req
+
+  const stockData = await _oracledb.execute(`
+    SELECT SUM(tbl.tblcount) as tuples
+      FROM(
+      (SELECT COUNT(*) as tblcount FROM STOCKDATA)
+      UNION ALL
+      (SELECT COUNT(*) as tblcount FROM STOCKS)
+      UNION ALL
+      (SELECT COUNT(*) as tblcount FROM STOCKINDEXDATA)
+      UNION ALL
+      (SELECT COUNT(*) as tblcount FROM STOCKINDEX)
+      UNION ALL
+      (SELECT COUNT(*) as tblcount FROM USER_ACCOUNT)
+      UNION ALL
+      (SELECT COUNT(*) as tblcount FROM GRAPH)
+      UNION ALL
+      (SELECT COUNT(*) as tblcount FROM FAVORITED_STOCKS)
+    ) tbl
+    `,
+  {},
+  {
+    fetchInfo: {
+      TUPLES: { type: oracledb.DEFAULT }
+    }
+  })
+    .catch((err) => console.log('Total Tuples Failed to Load', err))
+
+  console.log('Total Tuples in DB.', stockData)
+  await _oracledb.close()
+
+  if (stockData) {
+    return res.send({
+      success: true,
+      message: 'Number of Tuples Loaded',
+      data: stockData
+    })
+  } else {
+    return res.send({
+      success: false,
+      message: 'Total Tuples not Loaded.'
+    })
+  }
+}
+
+export const getStockInfo = async (req, res) => {
+  const { _oracledb } = req
+  const { query } = req
+  const { stock } = query
+
+  const stockData = await _oracledb.execute(`
+    SELECT Ticker, Name, Sector
+    FROM Stocks
+    WHERE Ticker = '${stock}'
+  `,
+  {},
+  {
+    fetchInfo: {
+      TICKER: { type: oracledb.STRING },
+      NAME: { type: oracledb.STRING },
+      SECTOR: { type: oracledb.STRING }
+    }
+  })
+  .catch((err) => console.log('Total Tuples Failed to Load', err))
+
+  console.log('Stock Information', stockData)
+  await _oracledb.close()
+
+  if (stockData) {
+    return res.send({
+      success: true,
+      message: 'Stock Information Loaded',
+      data: stockData
+    })
+  } else {
+    return res.send({
+      success: false,
+      message: 'Total Tuples not Loaded.'
+    })
+  }
+
 }
