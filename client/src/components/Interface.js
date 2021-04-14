@@ -1,217 +1,268 @@
-import React from 'react'
-import Graph from './Graph.js'
-import { Navbar, Button } from "react-bootstrap"
-import SearchBar from './SearchBar.js'
-import Option from './Option.js'
-import SectorSelector from './SectorSelector.js'
-import IndexSelector from './IndexSelector.js'
+import React from "react";
+import Graph from "./Graph.js";
+import { Navbar, Button } from "react-bootstrap";
+import SearchBar from "./SearchBar.js";
+import Option from "./Option.js";
+import SectorSelector from "./SectorSelector.js";
+import IndexSelector from "./IndexSelector.js";
 
 class Interface extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      title: '',
+      title: "",
       isLoaded: false,
-      stock: '',
+      stock: "",
       works: true,
       tuplesLoaded: false,
 
-      smaDays: '',
+      smaDays: "",
       smaActive: false,
 
-      pDays: '',
+      betaDays: "",
+      betaActive: false,
+
+      pDays: "",
       pActive: false,
 
-      vBucket: '',
+      vBucket: "",
       vActive: false,
 
-      index: '',
-      sector: '',
-      compDays: '',
-      compActive: false
-    }
-    this.getStock = this.getStock.bind(this)
-    this.getSMA = this.getSMA.bind(this)
-    this.getPercent = this.getPercent.bind(this)
-    this.getVolume = this.getVolume.bind(this)
-    this.handleReset = this.handleReset.bind(this)
-    this.handleTuples = this.handleTuples.bind(this)
-    this.getIndex = this.getIndex.bind(this)
-    this.getSector = this.getSector.bind(this)
-    this.getComparison = this.getComparison.bind(this)
+      index: "",
+      sector: "",
+      compDays: "",
+      compActive: false,
+    };
+    this.getStock = this.getStock.bind(this);
+    this.getSMA = this.getSMA.bind(this);
+    this.getBeta = this.getBeta.bind(this);
+    this.getPercent = this.getPercent.bind(this);
+    this.getVolume = this.getVolume.bind(this);
+    this.handleReset = this.handleReset.bind(this);
+    this.handleTuples = this.handleTuples.bind(this);
+    this.getIndex = this.getIndex.bind(this);
+    this.getSector = this.getSector.bind(this);
+    this.getComparison = this.getComparison.bind(this);
   }
 
-  async getStock (stock) {
+  async getStock(stock) {
     await this.setState({
-      stock: stock
-    })
+      stock: stock,
+    });
 
-    fetch('http://localhost:5000/api/getStockInfo/?stock=' + this.state.stock)
-      .then(res => res.json())
-      .then(stock => {
+    fetch("http://localhost:5000/api/getStockInfo/?stock=" + this.state.stock)
+      .then((res) => res.json())
+      .then((stock) => {
         if (stock.data.rows) {
-          const stockData = stock.data.rows[0]
-          const ticker = stockData[0]
-          const name = stockData[1]
-          const sector = stockData[2]
-          const text = `${ticker.toUpperCase()} | ${name} | ${sector} `
-          document.getElementById('title').textContent = text
+          const stockData = stock.data.rows[0];
+          const ticker = stockData[0];
+          const name = stockData[1];
+          const sector = stockData[2];
+          const text = `${ticker.toUpperCase()} | ${name} | ${sector} `;
+          document.getElementById("title").textContent = text;
         } else {
-          const text = ''
-          document.getElementById('title').textContent = text
+          const text = "";
+          document.getElementById("title").textContent = text;
         }
-      })
+      });
 
-    console.log('UPDATED STOCK', this.state.stock)
+    console.log("UPDATED STOCK", this.state.stock);
   }
 
-  getSMA (selected, days) {
+  getBeta(selected, days) {
+    if (selected) {
+      this.setState({
+        betaActive: selected,
+        betaDays: days,
+        reset: false,
+      });
+    } else {
+      this.setState({
+        betaActive: selected,
+        betaDays: "",
+        reset: false,
+      });
+    }
+  }
+
+  getSMA(selected, days) {
     if (selected) {
       this.setState({
         smaActive: selected,
         smaDays: days,
-        reset: false
-      })
+        reset: false,
+      });
     } else {
       this.setState({
         smaActive: selected,
-        smaDays: '',
-        reset: false
-      })
+        smaDays: "",
+        reset: false,
+      });
     }
-    console.log('Simple Moving Average Days', this.state.smaDays)
+    console.log("Simple Moving Average Days", this.state.smaDays);
   }
 
-  getPercent (selected, days) {
+  getPercent(selected, days) {
     if (selected) {
       this.setState({
         pActive: selected,
         pDays: days,
-        reset: false
-      })
+        reset: false,
+      });
     } else {
       this.setState({
         pActive: selected,
-        pDays: '',
-        reset: false
-      })
+        pDays: "",
+        reset: false,
+      });
     }
-    console.log('Percentage Days', this.state.pDays)
+    console.log("Percentage Days", this.state.pDays);
   }
 
-  getVolume (selected, days) {
+  getVolume(selected, days) {
     if (selected) {
       this.setState({
         vActive: selected,
         vBucket: days,
-        reset: false
-      })
+        reset: false,
+      });
     } else {
       this.setState({
         vActive: selected,
-        vBucket: '',
-        reset: false
-      })
+        vBucket: "",
+        reset: false,
+      });
     }
-    console.log('Volume Days', this.state.vBucket)
+    console.log("Volume Days", this.state.vBucket);
   }
 
-  getIndex (index) {
+  getIndex(index) {
     this.setState({
       index: index,
-      reset: false
-    })
-    console.log('Updated Index', this.state.index)
+      reset: false,
+    });
+    console.log("Updated Index", this.state.index);
   }
 
-  getSector (sector) {
+  getSector(sector) {
     this.setState({
       sector: sector,
-      reset: false
-    })
-    console.log('Updated Sector', this.state.sector)
+      reset: false,
+    });
+    console.log("Updated Sector", this.state.sector);
   }
 
-  getComparison (selected, days) {
+  getComparison(selected, days) {
     if (selected) {
       this.setState({
         compActive: true,
         compDays: days,
-        reset: false
-      })
+        reset: false,
+      });
     } else {
       this.setState({
         compActive: false,
-        compDays: '',
-        reset: false
-      })
+        compDays: "",
+        reset: false,
+      });
     }
-    console.log('Comparison Days', this.state.compDays)
+    console.log("Comparison Days", this.state.compDays);
   }
 
-  handleReset () {
-    console.log('Reset')
+  handleReset() {
+    console.log("Reset");
     this.setState({
-      stock: '',
-      smaDays: '',
+      stock: "",
+      smaDays: "",
       smaActive: false,
-      pDays: '',
+      betaDays: "",
+      betaActive: false,
+      pDays: "",
       pActive: false,
-      vBucket: '',
+      vBucket: "",
       vActive: false,
       reset: true,
-      sector: '',
-      index: '',
-      tuplesLoaded: false
-    })
-    document.getElementById('tuples').textContent = ''
-    document.getElementById('title').textContent = 'Graph'
+      sector: "",
+      index: "",
+      tuplesLoaded: false,
+    });
+    document.getElementById("tuples").textContent = "";
+    document.getElementById("title").textContent = "Graph";
   }
 
-  handleTuples () {
+  handleTuples() {
     if (!this.state.tuplesLoaded) {
-      fetch('http://localhost:5000/api/totalTuples')
-        .then(res => res.json())
-        .then(tuples => {
-          const data = tuples.data.rows[0]
-          const text = document.createTextNode(data)
-          document.getElementById('tuples').appendChild(text)
+      fetch("http://localhost:5000/api/totalTuples")
+        .then((res) => res.json())
+        .then((tuples) => {
+          const data = tuples.data.rows[0];
+          const text = document.createTextNode(data);
+          document.getElementById("tuples").appendChild(text);
         })
-        .catch(err => console.log('Error loading tuples...', err))
+        .catch((err) => console.log("Error loading tuples...", err));
 
       this.setState({
-        tuplesLoaded: true
-      })
+        tuplesLoaded: true,
+      });
     }
   }
 
-  render () {
+  render() {
     return (
-      <div className='front-page'>
+      <div className="front-page">
         <SearchBar handler={this.getStock} reset={this.state.reset} /> <br />
-        <div className='row'>
-          <div className='col-4'>
+        <div className="row">
+          <div className="col-4">
             <h3>Queries</h3>
-            <Option handler={this.getSMA} pHolder='Simple Moving Average Day Interval' reset={this.state.reset} />
-            <Option handler={this.getPercent} pHolder='Percentage Change Day Interval' reset={this.state.reset} />
-            <Option handler={this.getVolume} pHolder='Dollars Traded' reset={this.state.reset} /> <br />
-            <Option handler={this.getComparison} pHolder='Index & Sector Day Interval' reset={this.state.reset} />
+            <Option
+              handler={this.getSMA}
+              pHolder="Simple Moving Average Day Interval"
+              reset={this.state.reset}
+            />
+            <Option
+              handler={this.getPercent}
+              pHolder="Percentage Change Day Interval"
+              reset={this.state.reset}
+            />
+            <Option
+              handler={this.getVolume}
+              pHolder="Dollars Traded"
+              reset={this.state.reset}
+            />
+            <Option
+              handler={this.getBeta}
+              pHolder="Beta Coefficient Day Interval"
+              reset={this.state.reset}
+            />{" "}
+            <br />
+            <Option
+              handler={this.getComparison}
+              pHolder="Index & Sector Day Interval"
+              reset={this.state.reset}
+            />
             <SectorSelector handler={this.getSector} reset={this.state.reset} />
             <IndexSelector handler={this.getIndex} reset={this.state.reset} />
-            <Button variant='info' onClick={this.handleTuples}>Total Tuples</Button> <br />
-            <h6 id='tuples' />
-            <Button variant='danger' onClick={this.handleReset}>Reset</Button>
+            <Button variant="info" onClick={this.handleTuples}>
+              Total Tuples
+            </Button>{" "}
+            <br />
+            <h6 id="tuples" />
+            <Button variant="danger" onClick={this.handleReset}>
+              Reset
+            </Button>
           </div>
-          <div className='col-8'>
-            <div className='row-c'>
-              <h3 id='title'>Graph</h3>
+          <div className="col-8">
+            <div className="row-c">
+              <h3 id="title">Graph</h3>
             </div>
-            {this.state.stock ?
+            {this.state.stock ? (
               <Graph
                 title={this.state.title}
                 stock={this.state.stock}
                 smaDays={this.state.smaDays}
                 smaActive={this.state.smaActive}
+                betaDays={this.state.betaDays}
+                betaActive={this.state.betaActive}
                 pDays={this.state.pDays}
                 pActive={this.state.pActive}
                 vActive={this.state.vActive}
@@ -219,12 +270,15 @@ class Interface extends React.Component {
                 compActive={this.state.compActive}
                 index={this.state.index}
                 sector={this.state.sector}
-              /> : <p>Nothing Loaded...</p>}
+              />
+            ) : (
+              <p>Nothing Loaded...</p>
+            )}
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default Interface
+export default Interface;
